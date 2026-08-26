@@ -1,2 +1,3 @@
 # tenant-tools
-Tenant Tools repo containing all sorts of solutions
+
+A collection of Azure management tools, scripts, labs, and proofs of concept.
