@@ -1,8 +1,8 @@
-# Tools
+# Scripts
 
 Reusable PowerShell entry points and shared functions for the project scenarios.
 
-| Tool | Scenario | Purpose |
+| Script | Scenario | Purpose |
 |---|---|---|
 | `Deploy-TenantGuardrails.ps1` | Tenant-wide | Assign the initiative at a management group and lock specified subscriptions. |
 | `Remove-TenantGuardrails.ps1` | Tenant-wide | Remove specified subscription lock stacks, then remove the management-group Policy stack. |
@@ -14,4 +14,4 @@ Reusable PowerShell entry points and shared functions for the project scenarios.
 | `Remove-QuarantineGovernance.ps1` | Subscription quarantine | Remove the management-group governance stack. |
 | `Quarantine.Common.psm1` | Shared | Common validation, RBAC discovery, and lock deployment functions. |
 
-Run public tools from the project root. Tools reuse an existing Azure PowerShell context and never initiate sign-in.
+Run public scripts from the project root. Scripts reuse an existing Azure PowerShell context and never initiate sign-in.

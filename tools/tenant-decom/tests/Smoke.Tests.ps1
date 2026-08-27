@@ -5,7 +5,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path $PSScriptRoot -Parent
-$scriptFiles = @(Get-ChildItem -LiteralPath (Join-Path $projectRoot 'tools') -Include '*.ps1', '*.psm1' -Recurse)
+$scriptFiles = @(Get-ChildItem -LiteralPath (Join-Path $projectRoot 'scripts') -Include '*.ps1', '*.psm1' -Recurse)
 
 foreach ($file in $scriptFiles) {
     $tokens = $null
@@ -51,7 +51,7 @@ foreach ($command in $requiredStackCommands) {
 }
 
 $governanceDeploymentScript = Get-Content -LiteralPath (
-    Join-Path $projectRoot 'tools/Deploy-QuarantineGovernance.ps1'
+    Join-Path $projectRoot 'scripts/Deploy-QuarantineGovernance.ps1'
 ) -Raw
 $requiredPreviewText = @(
     'Governance deployment preview'
@@ -67,7 +67,7 @@ foreach ($previewText in $requiredPreviewText) {
 }
 
 $commonModuleContent = Get-Content -LiteralPath (
-    Join-Path $projectRoot 'tools/Quarantine.Common.psm1'
+    Join-Path $projectRoot 'scripts/Quarantine.Common.psm1'
 ) -Raw
 if ($commonModuleContent -match '(?m)^\s*Connect-AzAccount\b') {
     throw 'Guardrail scripts must not initiate interactive Azure authentication.'
@@ -80,7 +80,7 @@ foreach ($requiredRbacSafetyText in @('ConservativeFallback', 'attempt $attempt 
 }
 
 $readinessScript = Get-Content -LiteralPath (
-    Join-Path $projectRoot 'tools/Get-QuarantineReadiness.ps1'
+    Join-Path $projectRoot 'scripts/Get-QuarantineReadiness.ps1'
 ) -Raw
 $forbiddenFullEvidenceAssignments = @(
     'Resources                     = $resources'
@@ -98,6 +98,22 @@ foreach ($assignment in $forbiddenFullEvidenceAssignments) {
 foreach ($requiredSummary in @('ResourceTypeSummary', 'RoleAssignmentCount', 'PolicyExemptionCount')) {
     if ($readinessScript -notmatch "\b$requiredSummary\b") {
         throw "Readiness evidence is missing compact summary '$requiredSummary'."
+    }
+}
+
+$quarantineTemplate = Get-Content -LiteralPath (
+    Join-Path $projectRoot 'infra/subscription-quarantine/governance.bicep'
+) -Raw
+$quarantineParameterFiles = @(
+    'infra/subscription-quarantine/governance.example.bicepparam'
+)
+if ($quarantineTemplate -notmatch [regex]::Escape("param enforcementMode 'Default' | 'DoNotEnforce' = 'Default'")) {
+    throw "Subscription-quarantine Bicep must default Policy enforcement to 'Default'."
+}
+foreach ($relativePath in $quarantineParameterFiles) {
+    $parameterContent = Get-Content -LiteralPath (Join-Path $projectRoot $relativePath) -Raw
+    if ($parameterContent -notmatch [regex]::Escape("param enforcementMode = 'Default'")) {
+        throw "Subscription-quarantine parameter file '$relativePath' must set Policy enforcement to 'Default'."
     }
 }
 
@@ -131,8 +147,14 @@ foreach ($requiredRecoveryAccessText in @(
 }
 
 $tenantWideDeploymentScript = Get-Content -LiteralPath (
-    Join-Path $projectRoot 'tools/Deploy-TenantGuardrails.ps1'
+    Join-Path $projectRoot 'scripts/Deploy-TenantGuardrails.ps1'
 ) -Raw
+if ($tenantWideTemplate -notmatch [regex]::Escape("param enforcementMode 'Default' | 'DoNotEnforce' = 'Default'")) {
+    throw "Tenant-wide Bicep must default Policy enforcement to 'Default'."
+}
+if ($tenantWideDeploymentScript -notmatch [regex]::Escape("[string]`$EnforcementMode = 'Default'")) {
+    throw "Tenant-wide deployment must default Policy enforcement to 'Default'."
+}
 foreach ($requiredRecoveryAccessSafetyText in @(
         '-RecoveryAdministratorsGroupId is required when -EnableRecoveryAccess is specified.'
         'Recovery access  : Disabled'
@@ -163,7 +185,7 @@ foreach ($requiredProgressText in @(
 }
 
 $tenantWideRemovalScript = Get-Content -LiteralPath (
-    Join-Path $projectRoot 'tools/Remove-TenantGuardrails.ps1'
+    Join-Path $projectRoot 'scripts/Remove-TenantGuardrails.ps1'
 ) -Raw
 foreach ($requiredRemovalSafetyText in @('Remove-AzResourceLock', 'ScopeLocked', 'already absent')) {
     if ($tenantWideRemovalScript -notmatch [regex]::Escape($requiredRemovalSafetyText)) {
@@ -193,7 +215,7 @@ foreach ($requiredVerificationField in @(
     }
 }
 
-Import-Module (Join-Path $projectRoot 'tools/Quarantine.Common.psm1') -Force
+Import-Module (Join-Path $projectRoot 'scripts/Quarantine.Common.psm1') -Force
 $subscriptionId = [guid]'00000000-0000-0000-0000-000000000001'
 $actualScope = Get-SubscriptionScope -SubscriptionId $subscriptionId
 $expectedScope = '/subscriptions/00000000-0000-0000-0000-000000000001'

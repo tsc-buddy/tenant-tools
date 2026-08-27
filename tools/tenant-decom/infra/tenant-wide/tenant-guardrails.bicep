@@ -1,7 +1,7 @@
 targetScope = 'managementGroup'
 
 @sys.description('Whether the tenant guardrails Policy assignment is enforced.')
-param enforcementMode 'Default' | 'DoNotEnforce' = 'DoNotEnforce'
+param enforcementMode 'Default' | 'DoNotEnforce' = 'Default'
 
 @sys.description('Whether to create PIM-eligible recovery roles at the selected management group.')
 param enableRecoveryAccess bool = false

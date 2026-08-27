@@ -30,36 +30,41 @@ Get-AzContext
 Run from the project root:
 
 ```powershell
-./tools/Deploy-TenantGuardrails.ps1 `
+./scripts/Deploy-TenantGuardrails.ps1 `
   -ManagementGroupId 'contoso-platform' `
   -SubscriptionId @(
     '11111111-1111-1111-1111-111111111111',
     '22222222-2222-2222-2222-222222222222'
   ) `
+  -EnforcementMode Default `
   -WhatIf
 ```
 
-The preview is local intent only. It does not contact Azure or produce an Azure resource-level diff.
+The preview is local intent only. It does not contact Azure or produce an Azure resource-level diff. Including `-EnforcementMode Default` confirms that the subsequent deployment is intended to enforce the Policy deny effects.
 
 ## Deploy
 
 ```powershell
-./tools/Deploy-TenantGuardrails.ps1 `
+./scripts/Deploy-TenantGuardrails.ps1 `
   -ManagementGroupId 'contoso-platform' `
   -SubscriptionId @(
     '11111111-1111-1111-1111-111111111111',
     '22222222-2222-2222-2222-222222222222'
-  )
+  ) `
+  -EnforcementMode Default
 ```
+
+> [!WARNING]
+> `-EnforcementMode Default` activates the Policy deny effects for subscriptions beneath the management group. Rehearse the deployment against disposable subscriptions and review the target management-group hierarchy before using it in production.
 
 During deployment, PowerShell displays an elapsed-time progress indicator for the management-group stack and then for each subscription lock. Each phase prints its completion time before the next phase starts. If Azure fails a deployment, the progress indicator closes and the original Azure error is returned.
 
 The deployment tool compiles each local Bicep template to a temporary ARM JSON template before starting the asynchronous Azure job. The temporary file is removed when that phase finishes.
 
-Policy defaults to `DoNotEnforce`. After testing, enforce it explicitly:
+The script defaults to `Default`, which enforces the Policy deny effects. The examples specify `-EnforcementMode Default` explicitly so the intended behavior is clear. Use `-EnforcementMode DoNotEnforce` only when evaluation without blocking resource operations is intentional.
 
 ```powershell
-./tools/Deploy-TenantGuardrails.ps1 `
+./scripts/Deploy-TenantGuardrails.ps1 `
   -ManagementGroupId 'contoso-platform' `
   -SubscriptionId @('11111111-1111-1111-1111-111111111111') `
   -EnforcementMode Default
@@ -71,7 +76,7 @@ Policy defaults to `DoNotEnforce`. After testing, enforce it explicitly:
 |---|---:|---|
 | `ManagementGroupId` | Yes | Existing management group where the initiative is created and assigned. |
 | `SubscriptionId` | Yes | One or more subscriptions that receive a `ReadOnly` lock. |
-| `EnforcementMode` | No | `DoNotEnforce` by default; use `Default` after testing. |
+| `EnforcementMode` | No | Defaults to `Default`, which enforces the Policy deny effects. Use `DoNotEnforce` only to evaluate compliance without blocking operations. |
 | `EnableRecoveryAccess` | No | Enables PIM eligibility for Contributor and User Access Administrator. Disabled by default. |
 | `RecoveryAdministratorsGroupId` | When PIM is enabled | Microsoft Entra object ID of the Recovery Administrators group. |
 | `EligibilityDuration` | No | Finite ISO 8601 eligibility duration. Defaults to `P365D`. |
@@ -93,9 +98,10 @@ Policy and locks are independent:
 Enable recovery access only for a dedicated, tightly controlled Microsoft Entra group:
 
 ```powershell
-./tools/Deploy-TenantGuardrails.ps1 `
+./scripts/Deploy-TenantGuardrails.ps1 `
   -ManagementGroupId 'contoso-platform' `
   -SubscriptionId @('11111111-1111-1111-1111-111111111111') `
+  -EnforcementMode Default `
   -EnableRecoveryAccess `
   -RecoveryAdministratorsGroupId '22222222-2222-2222-2222-222222222222' `
   -EligibilityDuration 'P365D'
@@ -120,7 +126,7 @@ A pre-existing subscription `ReadOnly` lock can block Azure from creating or upd
 Use the same management group and complete subscription list used for deployment. Preview first:
 
 ```powershell
-./tools/Remove-TenantGuardrails.ps1 `
+./scripts/Remove-TenantGuardrails.ps1 `
   -ManagementGroupId 'contoso-platform' `
   -SubscriptionId @(
     '11111111-1111-1111-1111-111111111111',
@@ -132,7 +138,7 @@ Use the same management group and complete subscription list used for deployment
 Remove the controls after reviewing the preview:
 
 ```powershell
-./tools/Remove-TenantGuardrails.ps1 `
+./scripts/Remove-TenantGuardrails.ps1 `
   -ManagementGroupId 'contoso-platform' `
   -SubscriptionId @(
     '11111111-1111-1111-1111-111111111111',

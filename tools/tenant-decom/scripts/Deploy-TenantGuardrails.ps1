@@ -10,7 +10,7 @@ param(
 
     [Parameter()]
     [ValidateSet('Default', 'DoNotEnforce')]
-    [string]$EnforcementMode = 'DoNotEnforce',
+    [string]$EnforcementMode = 'Default',
 
     [Parameter()]
     [switch]$EnableRecoveryAccess,
