@@ -17,5 +17,5 @@ param protectedResourceTypes = [
   'Microsoft.Storage/storageAccounts'
 ]
 
-param enforcementMode = 'DoNotEnforce'
+param enforcementMode = 'Default'
 param eligibilityDuration = 'P365D'

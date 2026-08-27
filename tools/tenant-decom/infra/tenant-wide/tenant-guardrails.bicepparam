@@ -1,6 +1,6 @@
 using './tenant-guardrails.bicep'
 
-param enforcementMode = 'DoNotEnforce'
+param enforcementMode = 'Default'
 param enableRecoveryAccess = false
 param recoveryAdministratorsGroupId = ''
 param createContributorEligibility = false
