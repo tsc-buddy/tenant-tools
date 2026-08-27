@@ -62,7 +62,7 @@ infra/
   subscription-quarantine/     Bicep for the full quarantine scenario
 scenarios/
   tenant-wide/                 Tenant-wide operator runbook
-  subscription-quarantine/     Yet to be published
+  subscription-quarantine/     Full lifecycle runbooks and architecture guidance
 tests/                         Offline PowerShell safety and syntax checks
 ```
 
