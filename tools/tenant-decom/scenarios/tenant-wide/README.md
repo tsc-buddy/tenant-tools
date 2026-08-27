@@ -7,7 +7,7 @@ This scenario deploys decommissioning guardrails with two required inputs:
 
 By default, it does not move subscriptions, remove RBAC assignments, or configure PIM.
 
-PIM recovery access is available as an optional final control and is disabled by default.
+Eligable PIM assignment configuration is available as an optional final control and is disabled by default.
 
 ## Prerequisites
 
@@ -59,8 +59,6 @@ The preview is local intent only. It does not contact Azure or produce an Azure 
 
 During deployment, PowerShell displays an elapsed-time progress indicator for the management-group stack and then for each subscription lock. Each phase prints its completion time before the next phase starts. If Azure fails a deployment, the progress indicator closes and the original Azure error is returned.
 
-The deployment tool compiles each local Bicep template to a temporary ARM JSON template before starting the asynchronous Azure job. The temporary file is removed when that phase finishes.
-
 The script defaults to `Default`, which enforces the Policy deny effects. The examples specify `-EnforcementMode Default` explicitly so the intended behavior is clear. Use `-EnforcementMode DoNotEnforce` only when evaluation without blocking resource operations is intentional.
 
 ```powershell
@@ -93,9 +91,12 @@ Policy and locks are independent:
 - The script does not move subscriptions into the selected management group.
 - Optional PIM recovery roles are assigned at the selected management group and are inherited only by subscriptions beneath it.
 
-## Optional Recovery Access
+## Optional PIM Configuration
 
-Enable recovery access only for a dedicated, tightly controlled Microsoft Entra group:
+Enable recovery access only for a dedicated, tightly controlled Microsoft Entra group. The idea of this is in the event you wish to remove all RBAC assignments as part of your Decomissioning process.
+
+> [!Note]
+> Whilst that feature isnt in this scenario example, it does reside in the subscription quarantine scenario found [here.](../subscription-quarantine/README.mdscenarios/).
 
 ```powershell
 ./scripts/Deploy-TenantGuardrails.ps1 `
