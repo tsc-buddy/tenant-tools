@@ -61,7 +61,7 @@ az bicep build-params --file ./infra/subscription-quarantine/subscription-lock.e
 ./tests/Smoke.Tests.ps1
 ```
 
-Successful Bicep commands complete without errors. The smoke test ends with `Passed smoke tests for 7 PowerShell files.` These checks validate local syntax, not Azure permissions.
+Successful Bicep commands complete without errors. The smoke test ends with `Passed smoke tests for <n> PowerShell files.` These checks validate local syntax, not Azure permissions.
 
 ## Important Access Behavior
 
