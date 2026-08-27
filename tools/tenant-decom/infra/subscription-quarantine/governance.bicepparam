@@ -2,9 +2,9 @@ using './governance.bicep'
 
 param groups = {
   readers: [
-    '7bcf407b-f8e6-49c7-9118-8dc2d18c2760'
+    '11111111-1111-1111-1111-111111111111'
   ]
-  recoveryAdministrators: '3a99c3a1-b0c1-4aab-b6c7-38e08086470c'
+  recoveryAdministrators: '22222222-2222-2222-2222-222222222222'
 }
 
 param protectedResourceTypes = [

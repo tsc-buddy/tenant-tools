@@ -108,7 +108,7 @@ $results = foreach ($id in $subscriptionIds) {
     [pscustomobject]@{
         Scope       = $target
         StackName   = $LockStackName
-        Resource    = 'ReadOnly lock'
+        Resource    = 'ReadOnly lock + subscription deployment stack'
         PlannedOnly = [bool]$WhatIfPreference
     }
 }

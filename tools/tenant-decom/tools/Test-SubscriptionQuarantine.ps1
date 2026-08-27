@@ -29,8 +29,9 @@ $unapprovedAssignments = @($writeAssignments | Where-Object {
         $_.ObjectId -notin $ApprovedWritePrincipalId
     })
 $scope = Get-SubscriptionScope -SubscriptionId $SubscriptionId
-$policyAssignment = Get-AzPolicyAssignment -Scope $scope -ErrorAction Stop |
-    Where-Object DisplayName -eq 'Enforce subscription quarantine guardrails' |
+$managementGroupScope = "/providers/Microsoft.Management/managementGroups/$ExpectedManagementGroupId"
+$policyAssignment = Get-AzPolicyAssignment -Scope $managementGroupScope -ErrorAction Stop |
+    Where-Object Name -eq 'subscription-quarantine' |
     Select-Object -First 1
 
 $checks = @(
